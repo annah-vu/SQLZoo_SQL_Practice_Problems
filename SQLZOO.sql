@@ -177,5 +177,48 @@ and name like '%o%'
 and name like '%u%'
 and name not like '% %'
 
+--Show the lastName, party and votes for the constituency 'S14000024' in 2017
+
+SELECT lastName, party, votes
+FROM ge
+ WHERE constituency = 'S14000024' AND yr = 2017
+ORDER BY votes DESC
+
+
+/*Show the party and RANK for constituency S14000024 in 2017. List the output by party
+You can use the RANK function to see the order of the candidates.
+ If you RANK using (ORDER BY votes DESC) then the candidate with the most votes has rank 1. */
+
+SELECT party, votes,
+RANK() OVER (ORDER BY votes DESC) as posn
+FROM ge
+WHERE constituency = 'S14000024' AND yr = 2017
+ORDER BY party
+
+
+/*The 2015 election is a different PARTITION to the 2017 election. 
+We only care about the order of votes for each year.
+Use PARTITION to show the ranking of each party in S14000021 in each year. 
+Include yr, party, votes and ranking (the party with the most votes is 1). */
+ 
+SELECT yr,party, votes,
+RANK() OVER (PARTITION BY yr ORDER BY votes DESC) as posn
+FROM ge
+WHERE constituency = 'S14000021'
+ORDER BY party,yr
+ 
+/*Edinburgh constituencies are numbered S14000021 to S14000026.
+Use PARTITION BY constituency to show the ranking of each party in Edinburgh in 2017. 
+Order your results so the winners are shown first, then ordered by constituency. */
+ 
+SELECT constituency,party, votes, 
+rank() over(partition by constituency order by votes desc) as rank
+FROM ge
+WHERE constituency BETWEEN 'S14000021' AND 'S14000026'
+AND yr  = 2017
+ORDER BY rank,constituency
+ 
+
+
 
 
